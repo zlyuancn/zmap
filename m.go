@@ -20,6 +20,10 @@ func (m M) Add(k string, v interface{}, filters ...MapFilter) bool {
         return false
     }
 
+    if len(filters) == 0 {
+        return true
+    }
+
     if filterKV(k, v, filters...) {
         return false
     }
@@ -28,7 +32,7 @@ func (m M) Add(k string, v interface{}, filters ...MapFilter) bool {
 
 // 过滤
 func (m M) Filter(filters ...MapFilter) M {
-    if len(m) == 0 {
+    if len(m) == 0 || len(filters) == 0 {
         return m
     }
 
@@ -42,9 +46,10 @@ func (m M) Filter(filters ...MapFilter) M {
 
 // 根据指定过滤函数过滤
 func (m M) FilterOf(fn FilterFn) M {
-    if len(m) == 0 {
+    if len(m) == 0 || fn == nil {
         return m
     }
+
     for k, v := range m {
         if fn(k, v) {
             delete(m, k)
@@ -64,7 +69,7 @@ func filterKV(k string, v interface{}, filters ...MapFilter) bool {
 
 // 遍历
 func (m M) Foreach(fn func(k string, v interface{})) M {
-    if len(m) == 0 {
+    if len(m) == 0 || fn == nil {
         return m
     }
     for k, v := range m {
